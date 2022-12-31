@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -66,29 +67,51 @@ func (app *App) ParseFlags(args []string) []string {
 }
 
 // GatherLinks parses one or more files as HTML and returns links to test.
-func (app *App) GatherLinks(node *html.Node) []string {
+func (app *App) GatherLinks(text []byte) []string {
 	if app.NoOp() {
 		return []string{}
 	}
 
+	tkn := html.NewTokenizer(bytes.NewReader(text))
 	links := []string{}
 
-	if node.Type == html.ElementNode && node.Data == "a" {
-		for _, el := range node.Attr {
-			if el.Key == "href" && strings.HasPrefix(el.Val, "http") {
-				links = append(links, el.Val)
+	for {
+		tt := tkn.Next()
 
-				break
+		switch {
+		case tt == html.ErrorToken:
+			return links
+		case tt == html.StartTagToken:
+			t := tkn.Token()
+
+			if t.Data != "a" {
+				continue
 			}
+
+			link, ok := getLink(t)
+			if !ok {
+				continue
+			}
+
+			links = append(links, link)
+		}
+	}
+}
+
+func getLink(t html.Token) (string, bool) {
+	link := ""
+	ok := false
+
+	for _, a := range t.Attr {
+		if a.Key == "href" && strings.HasPrefix(a.Val, "http") {
+			link = a.Val
+			ok = true
+
+			break
 		}
 	}
 
-	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		tempLinks := app.GatherLinks(c)
-		links = append(links, tempLinks...)
-	}
-
-	return links
+	return link, ok
 }
 
 // TestLinks runs GET requests on links to test for link rot.
@@ -113,7 +136,7 @@ func (app *App) TestLinks(links []string) {
 
 func (app *App) testLink(link string, ch chan<- string) {
 	client := &http.Client{
-		Timeout: time.Second * 1,
+		Timeout: time.Second * 10,
 	}
 
 	resp, err := client.Get(link)

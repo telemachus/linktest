@@ -3,9 +3,8 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"os"
-
-	"golang.org/x/net/html"
 )
 
 const (
@@ -35,7 +34,7 @@ func Run(args []string) int {
 			continue
 		}
 
-		doc, err := html.Parse(fh)
+		doc, err := io.ReadAll(fh)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s: skipping %q: %v\n", appName, file, err)
 			app.FileProblems++
