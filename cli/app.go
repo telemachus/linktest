@@ -21,6 +21,8 @@ type App struct {
 	LinkProblems  int
 	Verbose       bool
 	VersionWanted bool
+	CPUProfile    string
+	MemProfile    string
 }
 
 // NoOp determines whether an App should bail out.
@@ -44,6 +46,8 @@ func (app *App) ParseFlags(args []string) []string {
 	flags.BoolVar(&app.HelpWanted, "help", false, "")
 	flags.BoolVar(&app.Verbose, "verbose", false, "")
 	flags.BoolVar(&app.VersionWanted, "version", false, "")
+	flags.StringVar(&app.CPUProfile, "cpuprofile", "", "write cpu profile to `file`")
+	flags.StringVar(&app.MemProfile, "memprofile", "", "write memory profile to `file`")
 
 	err := flags.Parse(args)
 	files := flags.Args()

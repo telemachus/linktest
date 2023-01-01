@@ -4,7 +4,10 @@ package cli
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 )
 
 const (
@@ -25,6 +28,18 @@ func Run(args []string) int {
 	app := &App{ExitValue: exitSuccess}
 	files := app.ParseFlags(args)
 
+	if app.CPUProfile != "" {
+		f, err := os.Create(app.CPUProfile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	for _, file := range files {
 		fh, err := os.Open(file)
 		if err != nil {
@@ -44,6 +59,18 @@ func Run(args []string) int {
 
 		links := app.GatherLinks(doc)
 		app.TestLinks(links)
+	}
+
+	if app.MemProfile != "" {
+		f, err := os.Create(app.MemProfile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close() // error handling omitted for example
+		runtime.GC()    // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write memory profile: ", err)
+		}
 	}
 
 	return app.ExitStatus()
