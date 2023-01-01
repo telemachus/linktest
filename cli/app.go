@@ -66,8 +66,8 @@ func (app *App) ParseFlags(args []string) []string {
 	return files
 }
 
-// GatherLinks parses one or more files as HTML and returns links to test.
-func (app *App) GatherLinks(text []byte) []string {
+// GetLinks parses one or more files as HTML and returns links to test.
+func (app *App) GetLinks(text []byte) []string {
 	if app.NoOp() {
 		return []string{}
 	}

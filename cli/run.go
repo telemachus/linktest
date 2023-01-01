@@ -42,7 +42,7 @@ func Run(args []string) int {
 			continue
 		}
 
-		links := app.GatherLinks(doc)
+		links := app.GetLinks(doc)
 		app.TestLinks(links)
 	}
 
