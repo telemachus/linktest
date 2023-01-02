@@ -40,7 +40,6 @@ linters:
     - gocritic
     - gofumpt
     - goimports
-    - gomnd
     - gosec
     - gosimple
     - govet
