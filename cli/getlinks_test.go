@@ -1,8 +1,6 @@
 package cli_test
 
 import (
-	"io"
-	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -29,19 +27,9 @@ func wantedLinks() []string {
 func TestGetLinks(t *testing.T) {
 	t.Parallel()
 
-	fh, err := os.Open(goldenFile)
-	if err != nil {
-		t.Fatalf("cannot open %s: %v", goldenFile, err)
-	}
-
-	doc, err := io.ReadAll(fh)
-	if err != nil {
-		t.Fatalf("cannot read %s: %v", goldenFile, err)
-	}
-
 	wanted := wantedLinks()
 	app := &cli.App{ExitValue: 0}
-	got := app.GetLinks(doc)
+	got := app.GetLinks(goldenFile)
 
 	if !cmp.Equal(wanted, got) {
 		t.Error(cmp.Diff(wanted, got))

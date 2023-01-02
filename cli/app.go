@@ -67,8 +67,15 @@ func (app *App) ParseFlags(args []string) []string {
 }
 
 // GetLinks parses one or more files as HTML and returns links to test.
-func (app *App) GetLinks(text []byte) []string {
+func (app *App) GetLinks(file string) []string {
 	if app.NoOp() {
+		return []string{}
+	}
+
+	text, err := app.getContent(file)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: skipping %q: %v\n", appName, file, err)
+
 		return []string{}
 	}
 
@@ -96,6 +103,24 @@ func (app *App) GetLinks(text []byte) []string {
 			links = append(links, link)
 		}
 	}
+}
+
+func (app *App) getContent(file string) ([]byte, error) {
+	fh, err := os.Open(file)
+	if err != nil {
+		app.FileProblems++
+
+		return []byte{}, err
+	}
+
+	doc, err := io.ReadAll(fh)
+	if err != nil {
+		app.FileProblems++
+
+		return []byte{}, err
+	}
+
+	return doc, nil
 }
 
 func getLink(t html.Token) (string, bool) {

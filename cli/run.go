@@ -1,12 +1,6 @@
 // Package cli organizes and implements a command line program.
 package cli
 
-import (
-	"fmt"
-	"io"
-	"os"
-)
-
 const (
 	exitSuccess = 0
 	exitFailure = 1
@@ -26,23 +20,7 @@ func Run(args []string) int {
 	files := app.ParseFlags(args)
 
 	for _, file := range files {
-		fh, err := os.Open(file)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s: skipping %q: %v\n", appName, file, err)
-			app.FileProblems++
-
-			continue
-		}
-
-		doc, err := io.ReadAll(fh)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s: skipping %q: %v\n", appName, file, err)
-			app.FileProblems++
-
-			continue
-		}
-
-		links := app.GetLinks(doc)
+		links := app.GetLinks(file)
 		app.TestLinks(links)
 	}
 
