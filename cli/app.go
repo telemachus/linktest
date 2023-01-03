@@ -16,9 +16,7 @@ import (
 // App stores information about the application's state.
 type App struct {
 	ExitValue     int
-	FileProblems  int
 	HelpWanted    bool
-	LinkProblems  int
 	Verbose       bool
 	VersionWanted bool
 }
@@ -108,14 +106,14 @@ func (app *App) GetLinks(file string) []string {
 func (app *App) getContent(file string) ([]byte, error) {
 	fh, err := os.Open(file)
 	if err != nil {
-		app.FileProblems++
+		app.ExitValue = exitFailure
 
 		return []byte{}, err
 	}
 
 	doc, err := io.ReadAll(fh)
 	if err != nil {
-		app.FileProblems++
+		app.ExitValue = exitFailure
 
 		return []byte{}, err
 	}
@@ -166,22 +164,16 @@ func (app *App) testLink(link string, ch chan<- string) {
 
 	resp, err := client.Get(link)
 	if err != nil {
-		ch <- fmt.Sprintf("%s: %s: %v", appName, link, err)
-		app.LinkProblems++
+		app.ExitValue = exitFailure
 
-		return
+		ch <- fmt.Sprintf("%s: %s: %v", appName, link, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		app.ExitValue = exitFailure
 	}
 
-	defer resp.Body.Close()
 	ch <- fmt.Sprintf("%s: %q: %d %s", appName, link, resp.StatusCode,
 		http.StatusText(resp.StatusCode))
-}
-
-// ExitStatus returns an appropriate exit status for an app.
-func (app *App) ExitStatus() int {
-	if app.ExitValue != exitSuccess || app.FileProblems > 0 || app.LinkProblems > 0 {
-		return exitFailure
-	}
-
-	return exitSuccess
 }

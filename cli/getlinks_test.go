@@ -7,9 +7,12 @@ import (
 	"github.com/telemachus/linktest/cli"
 )
 
-const goldenFile = "testdata/telemachus.html"
+const (
+	goldenFile = "testdata/telemachus.html"
+	emptyFile  = "testdata/empty.html"
+)
 
-func wantedLinks() []string {
+func mixedLinks() []string {
 	return []string{
 		"https://telemachus.me/foobar",
 		"https://telemachus.me/about",
@@ -24,12 +27,24 @@ func wantedLinks() []string {
 	}
 }
 
-func TestGetLinks(t *testing.T) {
+func TestMixedLinks(t *testing.T) {
 	t.Parallel()
 
-	wanted := wantedLinks()
+	wanted := mixedLinks()
 	app := &cli.App{ExitValue: 0}
 	got := app.GetLinks(goldenFile)
+
+	if !cmp.Equal(wanted, got) {
+		t.Error(cmp.Diff(wanted, got))
+	}
+}
+
+func TestEmptyFile(t *testing.T) {
+	t.Parallel()
+
+	wanted := []string{}
+	app := &cli.App{ExitValue: 0}
+	got := app.GetLinks(emptyFile)
 
 	if !cmp.Equal(wanted, got) {
 		t.Error(cmp.Diff(wanted, got))

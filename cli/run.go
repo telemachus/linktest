@@ -18,11 +18,13 @@ options:
 func Run(args []string) int {
 	app := &App{ExitValue: exitSuccess}
 	files := app.ParseFlags(args)
+	links := []string{}
 
 	for _, file := range files {
-		links := app.GetLinks(file)
-		app.TestLinks(links)
+		links = append(links, app.GetLinks(file)...)
 	}
 
-	return app.ExitStatus()
+	app.TestLinks(links)
+
+	return app.ExitValue
 }
