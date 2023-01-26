@@ -150,9 +150,9 @@ func (app *App) TestLinks(links []string) {
 	}
 
 	for range links {
-		msg := <-ch
-		if app.Verbose || !strings.HasSuffix(msg, "200 OK") {
-			fmt.Println(msg)
+		status := <-ch
+		if app.Verbose || !strings.HasSuffix(status, "200 OK") {
+			fmt.Println(status)
 		}
 	}
 }
