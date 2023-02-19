@@ -1,8 +1,6 @@
 // Package cli organizes and implements a command line program.
 package cli
 
-import "os"
-
 const (
 	exitSuccess = 0
 	exitFailure = 1
@@ -21,12 +19,11 @@ func Run(args []string) int {
 	app := &App{ExitValue: exitSuccess}
 	fileNames := app.ParseFlags(args)
 
-	logger := newLogger(os.Stderr)
-	fileCh := app.FileGen(fileNames, logger)
+	fileCh := app.FileGen(fileNames)
 	linkCh := app.LinkGen(fileCh)
 	statusCh := app.CheckStatus(linkCh)
 
-	app.Display(statusCh, logger)
+	app.Display(statusCh)
 
 	return app.ExitValue
 }

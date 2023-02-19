@@ -5,9 +5,6 @@ import (
 	"io"
 	"os"
 	"sync"
-
-	kitlog "github.com/go-kit/log"
-	"github.com/go-kit/log/level"
 )
 
 // File stores information and data for a file.
@@ -16,7 +13,7 @@ type File struct {
 	Content []byte
 }
 
-func (app *App) FileGen(files []string, logger kitlog.Logger) chan *File {
+func (app *App) FileGen(files []string) chan *File {
 	if app.NoOp() {
 		return nil
 	}
@@ -32,9 +29,8 @@ func (app *App) FileGen(files []string, logger kitlog.Logger) chan *File {
 		if err != nil {
 			app.ExitValue = exitFailure
 
-			level.Warn(logger).Log(
-				"msg", fmt.Sprintf("skipping [%s]: %v", file, err),
-			)
+			msg := fmt.Sprintf("%s: skipping [%s]: %v", appName, file, err)
+			advise(msg)
 
 			return
 		}

@@ -1,69 +1,59 @@
 package cli
 
 import (
-	"os"
-
-	kitlog "github.com/go-kit/log"
-	"github.com/go-kit/log/level"
+	"fmt"
 )
 
-func (app *App) Display(statusCh <-chan *Link, logger kitlog.Logger) {
+func (app *App) Display(statusCh <-chan *Link) {
 	if app.NoOp() {
 		return
 	}
 
 	if app.Verbose {
-		displayAll(statusCh, logger)
+		displayAll(statusCh)
 
 		return
 	}
 
 	for link := range statusCh {
 		switch {
-		case link.Err != nil:
-			level.Error(logger).Log(
-				"file", link.File,
-				"URL", link.URL,
-				"status", link.Status,
-				"error", link.Err,
+		case link.Err != nil, link.Status != 200:
+			msg := fmt.Sprintf(
+				"%s: %q: %q: %d: %v",
+				appName,
+				link.File,
+				link.URL,
+				link.Status,
+				link.Err,
 			)
-		case link.Status != 200:
-			level.Warn(logger).Log(
-				"file", link.File,
-				"URL", link.URL,
-				"status", link.Status,
-				"error", link.Err,
-			)
+			advise(msg)
 		}
 	}
 }
 
-func displayAll(statusCh <-chan *Link, errLogger kitlog.Logger) {
-	outLogger := newLogger(os.Stdout)
-
+func displayAll(statusCh <-chan *Link) {
 	for link := range statusCh {
 		switch {
-		case link.Err != nil:
-			level.Error(errLogger).Log(
-				"file", link.File,
-				"URL", link.URL,
-				"status", link.Status,
-				"error", link.Err,
+		case link.Err != nil, link.Status != 200:
+			msg := fmt.Sprintf(
+				"%s: %q: %q: %d: %v",
+				appName,
+				link.File,
+				link.URL,
+				link.Status,
+				link.Err,
 			)
-		case link.Status != 200:
-			level.Warn(errLogger).Log(
-				"file", link.File,
-				"URL", link.URL,
-				"status", link.Status,
-				"error", link.Err,
-			)
+			advise(msg)
 		default:
-			level.Info(outLogger).Log(
-				"file", link.File,
-				"URL", link.URL,
-				"status", link.Status,
-				"error", link.Err,
+			msg := fmt.Sprintf(
+				"%s: %q: %q: %d: %v",
+				appName,
+				link.File,
+				link.URL,
+				link.Status,
+				link.Err,
 			)
+			inform(msg)
 		}
 	}
 }
