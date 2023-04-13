@@ -2,6 +2,8 @@ linters-settings:
   errcheck:
     check-type-assertions: true
     check-blank: true
+    exclude-functions:
+      - (github.com/go-kit/log.Logger).Log
   goconst:
     min-len: 2
     min-occurrences: 3
@@ -58,7 +60,6 @@ linters:
     - unparam
     - unused
     - whitespace
-    - wsl
 
 run:
   issues-exit-code: 1
