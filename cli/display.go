@@ -2,9 +2,8 @@ package cli
 
 import (
 	"context"
+	"log/slog"
 	"os"
-
-	"golang.org/x/exp/slog"
 )
 
 func (app *App) Display(statusCh <-chan *Link, logger *slog.Logger) {

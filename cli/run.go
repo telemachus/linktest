@@ -7,7 +7,7 @@ const (
 	exitSuccess = 0
 	exitFailure = 1
 	appName     = "linktest"
-	appVersion  = "v0.1.0"
+	appVersion  = "v0.2.0"
 	appUsage    = `usage: linktest [-verbose] file ...
 
 options:

@@ -3,10 +3,9 @@ package cli
 import (
 	"context"
 	"io"
+	"log/slog"
 	"os"
 	"sync"
-
-	"golang.org/x/exp/slog"
 )
 
 // File stores information and data for a file.

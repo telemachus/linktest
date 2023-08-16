@@ -2,9 +2,9 @@ package cli
 
 import (
 	"io"
+	"log/slog"
 
 	"github.com/telemachus/humane"
-	"golang.org/x/exp/slog"
 )
 
 func removeTime(groups []string, a slog.Attr) slog.Attr {
@@ -16,9 +16,9 @@ func removeTime(groups []string, a slog.Attr) slog.Attr {
 
 // newLogger returns a configured slog logger.
 func newLogger(w io.Writer) *slog.Logger {
-	ho := humane.Options{
+	opts := &humane.Options{
 		ReplaceAttr: removeTime,
 	}
-	logger := slog.New(ho.NewHandler(w))
+	logger := slog.New(humane.NewHandler(w, opts))
 	return logger.With(slog.String("program", appName))
 }

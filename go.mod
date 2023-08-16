@@ -1,9 +1,8 @@
 module github.com/telemachus/linktest
 
-go 1.19
+go 1.21
 
 require (
-	github.com/telemachus/humane v0.3.0
-	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
-	golang.org/x/net v0.4.0
+	github.com/telemachus/humane v0.5.1
+	golang.org/x/net v0.14.0
 )
